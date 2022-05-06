@@ -1,0 +1,106 @@
+info:
+  app:
+    name: mjarray-batch-import
+    version: 1.0.0-SNAPSHOT
+
+mjarray:
+  mvc:
+    overview:
+      enable: false
+  batch:
+    enable-runner: false
+    config:
+      partitioner:
+        chunk-size: 100
+        max-pool-size: 50
+      step:
+        chunk-size: 100
+        max-pool-size: 50
+      files:
+        column-delimiter: '|'
+        command-file-prefix: orders_
+        product-file-prefix: products_
+        sale-file-prefix: sale_
+      order-status:
+          - PAIED
+          - EXPIRED
+          - IN_PROGRESS
+  datasource-master:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ecomerce # started in a Docker container, see docker-compose.yml
+    password: admin
+    username: admin
+    continue-on-error: true
+    platform: all
+    initialization-mode: always
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 2
+      data-source-properties:
+        socketTimeout: 120
+  datasource-readonly:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ecomerce # started in a Docker container, see docker-compose.yml
+    password: admin
+    username: admin
+    hikari:
+      maximum-pool-size: 100
+      minimum-idle: 2
+      data-source-properties:
+        socketTimeout: 120
+
+spring:
+  application:
+    name: batch-cmdm-import
+  main:
+    web-application-type: none
+    allow-bean-definition-overriding: true
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+  jdbc:
+    query-timeout: 30000ms
+  cloud:
+    refresh:
+      # Work around a circular dependency in Spring Boot: https://github.com/spring-projects/spring-boot/issues/13042
+      # See also https://github.com/spring-cloud/spring-cloud-commons/issues/355 which provides this work-around
+      # and https://github.com/spring-petclinic/spring-petclinic-microservices/issues/72
+      refreshable: none
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: ecomerce
+        jdbc:
+          lob:
+            non_contextual_creation: true # Disable contextual LOB creation
+#  spring.jpa.database = POSTGRESQL
+#  spring.jpa.database_platform = com.renault.wired.postgresql.hibernate.dialect.JSONBPostgreSQLDialect
+#  spring.jpa.open-in-view = false
+#  spring.jpa.properties.hibernate.order_inserts = true
+#  spring.jpa.properties.hibernate.order_updates = true
+#  spring.jpa.properties.hibernate.jdbc.batch_size = 5
+#  spring.jpa.properties.hibernate.query.fail_on_pagination_over_collection_fetch = true
+#  spring.jpa.properties.hibernate.query.in_clause_parameter_padding = true
+
+  sql:
+    init:
+      schema-locations: schema-all.sql
+      mode: always
+      continue-on-error: true
+      platform: all
+  jmx:
+    enabled: false # Disable management beans
+
+logging:
+  level:
+    org.springframework.jdbc: DEBUG
+    com.renault.wired: DEBUG
