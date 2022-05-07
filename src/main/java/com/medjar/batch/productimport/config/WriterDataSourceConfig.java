@@ -43,6 +43,7 @@ public class WriterDataSourceConfig {
     @Bean("dataSource")
     public DataSource dataSource(@Qualifier("writeDataSourceProperties") DataSourceProperties writeDataSourceProperties) {
         log.info("Create datasource master {} ", writeDataSourceProperties.getUrl());
+        writeDataSourceProperties.setSchema(Collections.singletonList("schema-all.sql"));
         return writeDataSourceProperties.initializeDataSourceBuilder().build();
     }
 
