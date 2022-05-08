@@ -2,10 +2,10 @@ package com.medjar.batch.productimport.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.batch.BatchDataSourceScriptDatabaseInitializer;
+import org.springframework.boot.autoconfigure.batch.BatchDataSourceInitializer;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.sql.init.DatabaseInitializationSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -19,7 +19,6 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 
 /**
  * Created By Jarray Mohamed.
@@ -43,7 +42,6 @@ public class WriterDataSourceConfig {
     @Bean("dataSource")
     public DataSource dataSource(@Qualifier("writeDataSourceProperties") DataSourceProperties writeDataSourceProperties) {
         log.info("Create datasource master {} ", writeDataSourceProperties.getUrl());
-        writeDataSourceProperties.setSchema(Collections.singletonList("schema-all.sql"));
         return writeDataSourceProperties.initializeDataSourceBuilder().build();
     }
 
@@ -53,10 +51,10 @@ public class WriterDataSourceConfig {
     }
 
     @Bean
-    public BatchDataSourceScriptDatabaseInitializer batchDataSourceInitializer(@Qualifier("dataSource") DataSource dataSource,
-                                                                               ResourceLoader resourceLoader) throws IOException {
-        DatabaseInitializationSettings settings = new DatabaseInitializationSettings();
-        BatchDataSourceScriptDatabaseInitializer batchDataSourceInitializer = new BatchDataSourceScriptDatabaseInitializer(dataSource, settings);
+    public BatchDataSourceInitializer batchDataSourceInitializer(@Qualifier("dataSource") DataSource dataSource,
+                                                                 ResourceLoader resourceLoader,
+                                                                 BatchProperties properties) throws IOException {
+        BatchDataSourceInitializer batchDataSourceInitializer = new BatchDataSourceInitializer(dataSource, resourceLoader, properties);
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         Resource resource = resourceLoader.getResource(CLASSPATH_SCHEMA_SQL);
         try (InputStream inputStream = resource.getInputStream()) {
@@ -69,5 +67,4 @@ public class WriterDataSourceConfig {
         DatabasePopulatorUtils.execute(populator, dataSource);
         return batchDataSourceInitializer;
     }
-
 }

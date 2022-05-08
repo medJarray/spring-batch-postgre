@@ -13,6 +13,7 @@ import java.time.LocalDate;
  */
 @Data
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"orderId"})
