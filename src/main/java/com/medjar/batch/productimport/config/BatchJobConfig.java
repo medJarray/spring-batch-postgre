@@ -1,6 +1,7 @@
 package com.medjar.batch.productimport.config;
 
 import com.medjar.batch.productimport.batch.reader.OrderReader;
+import com.medjar.batch.productimport.batch.tasklet.ExtractFilesTasklet;
 import com.medjar.batch.productimport.batch.writer.OrderWriter;
 import com.medjar.batch.productimport.properties.BatchProperties;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileParseException;
@@ -54,6 +56,11 @@ public class BatchJobConfig {
     }
 
     @Bean
+    public Tasklet extractFileTsklet() {
+        return new ExtractFilesTasklet(batchProperties);
+    }
+
+    @Bean
     public Flow saveOrdersFlow(OrderReader orderReader,
                                OrderWriter orderWriter,
                                @Qualifier("stepTaskExecutor") TaskExecutor stepTaskExecutor) {
@@ -65,6 +72,15 @@ public class BatchJobConfig {
     public Flow saveFilesFlow(@Qualifier("saveOrdersFlow") Flow saveOrdersFlow) {
         return new FlowBuilder<Flow>("saveFileFlow")
                 .start(saveOrdersFlow)
+                .build();
+    }
+
+    @Bean
+    public Flow extractFlow(Tasklet extractFilesTasklet) {
+        return new FlowBuilder<Flow>("extractFlow")
+                .start(stepBuilderFactory.get("extractSdeFilesStep")
+                        .tasklet(extractFilesTasklet)
+                        .build())
                 .build();
     }
 
@@ -102,10 +118,12 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public Job batchImportJob(@Qualifier("saveFilesFlow") Flow saveFilesFlow) {
+    public Job batchImportJob(@Qualifier("extractFlow") Flow extractFlow,
+                              @Qualifier("saveFilesFlow") Flow saveFilesFlow) {
         return jobBuilderFactory.get("batchImportJob")
                 .incrementer(new RunIdIncrementer())
-                .start(saveFilesFlow)
+                .start(extractFlow)
+                .next(saveFilesFlow)
                 .end()
                 .build();
     }

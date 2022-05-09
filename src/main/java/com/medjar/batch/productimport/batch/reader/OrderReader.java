@@ -4,7 +4,6 @@ import com.medjar.batch.productimport.enums.ImportBoolean;
 import com.medjar.batch.productimport.model.OrderEntity;
 import com.medjar.batch.productimport.properties.BatchProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.file.transform.FieldSet;
@@ -14,16 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static com.medjar.batch.productimport.constant.BatchImportConstant.JOB_PARAM_FILE;
+import static com.medjar.batch.productimport.constant.BatchImportConstant.JOB_PARAM_ORDER_TEMP_FILE;
 import static com.medjar.batch.productimport.util.BatchUtils.booleanConvert;
 
 /**
@@ -38,10 +32,11 @@ import static com.medjar.batch.productimport.util.BatchUtils.booleanConvert;
 public class OrderReader extends AbstractReader<OrderEntity> {
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("d/MM/yyyy");
+
     @Autowired
     private BatchProperties batchProperties;
 
-    @Value("#{jobExecutionContext[" + JOB_PARAM_FILE + "]}")
+    @Value("#{jobExecutionContext[" + JOB_PARAM_ORDER_TEMP_FILE + "]}")
     private File orderTempFile;
 
     @Override
@@ -56,24 +51,25 @@ public class OrderReader extends AbstractReader<OrderEntity> {
 
     @Override
     protected File getFile() {
-        InputStream initialStream;
-        File targetFile = new File("/Users/med/Desktop/in-comming/orders_1.data");
-
-        try {
-            initialStream = new FileInputStream(
-                    "/Users/med/Desktop/in-comming/orders.data");
-            Files.copy(
-                    initialStream,
-                    targetFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-
-            IOUtils.closeQuietly(initialStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-
-        }
-        log.info("------------  target file name : {}  ---------------", targetFile.getName());
-        return targetFile;
+        return orderTempFile;
+//        InputStream initialStream;
+//        File targetFile = new File("/Users/med/Desktop/in-comming/orders_1.data");
+//
+//        try {
+//            initialStream = new FileInputStream(
+//                    "/Users/med/Desktop/in-comming/orders.data");
+//            Files.copy(
+//                    initialStream,
+//                    targetFile.toPath(),
+//                    StandardCopyOption.REPLACE_EXISTING);
+//
+//            IOUtils.closeQuietly(initialStream);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//
+//        }
+//        log.info("------------  target file name : {}  ---------------", targetFile.getName());
+//        return targetFile;
     }
 
     @Override

@@ -44,6 +44,7 @@ mjarray:
         chunk-size: 100
         max-pool-size: 50
       files:
+        tar-file-name-pattern: (ecomerce_import)(.*)\.tgz$
         column-delimiter: '|'
         command-file-prefix: orders_
         product-file-prefix: products_
