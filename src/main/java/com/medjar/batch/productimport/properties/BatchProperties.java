@@ -46,10 +46,15 @@ public class BatchProperties {
     @AllArgsConstructor
     @NoArgsConstructor
     public static final class ImportFiles {
+
+        public static final int ZIP_FILENAME_PREFIX_GROUP = 1;
+
         /**
          * The delimiter char used for SDE files.
          */
         private String columnDelimiter;
+
+        private String tarFileNamePattern;
 
         // The import file prefix
         private String orderFilePrefix;
