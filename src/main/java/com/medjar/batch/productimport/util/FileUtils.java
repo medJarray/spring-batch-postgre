@@ -25,8 +25,8 @@ public class FileUtils {
 
     public static List<File> extractTargzFile(InputStream gzTarFile) throws IOException {
         List<File> files = new ArrayList<>();
-        try (GzipCompressorInputStream gcis = new GzipCompressorInputStream(gzTarFile);
-             TarArchiveInputStream tis = new TarArchiveInputStream(gcis)) {
+        GzipCompressorInputStream gcis = new GzipCompressorInputStream(gzTarFile);
+        try (TarArchiveInputStream tis = new TarArchiveInputStream(gcis)) {
             ArchiveEntry tarEntry = tis.getNextTarEntry();
 
             while (Objects.nonNull(tarEntry)) {

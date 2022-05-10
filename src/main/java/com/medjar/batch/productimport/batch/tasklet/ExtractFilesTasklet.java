@@ -58,7 +58,7 @@ public class ExtractFilesTasklet implements Tasklet {
         }
         String zipPrefix = matcher.group(BatchProperties.ImportFiles.ZIP_FILENAME_PREFIX_GROUP);
         List<File> unzippedFiles;
-        try (InputStream fileInputStream = new FileInputStream(resource.getFile())) {
+        try (InputStream fileInputStream = new FileInputStream("/" + ((ClassPathResource) resource).getPath())) {
             unzippedFiles = extractTargzFile(fileInputStream);
         }
 
