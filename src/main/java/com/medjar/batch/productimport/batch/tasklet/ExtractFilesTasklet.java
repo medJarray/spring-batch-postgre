@@ -91,11 +91,11 @@ public class ExtractFilesTasklet implements Tasklet {
     private String setUpCorrespondFileJobParam(File unzippedFile, String zipPrefix, BatchProperties.ImportFiles importFiles) {
         String fileName = unzippedFile.getName().toLowerCase();
         String jobParameter = null;
-        if (fileName.startsWith(zipPrefix + importFiles.getSaleFilePrefix())) {
+        if (fileName.startsWith(importFiles.getSaleFilePrefix())) {
             jobParameter = JOB_PARAM_ORDER_TEMP_FILE;
-        } else if (fileName.startsWith(zipPrefix + importFiles.getOrderFilePrefix())) {
+        } else if (fileName.startsWith(importFiles.getOrderFilePrefix())) {
             jobParameter = JOB_PARAM_ORDER_TEMP_FILE;
-        } else if (fileName.startsWith(zipPrefix + importFiles.getProductFilePrefix())) {
+        } else if (fileName.startsWith(importFiles.getProductFilePrefix())) {
             jobParameter = JOB_PARAM_PRODUCT_TEMP_FILE;
         }
         return jobParameter;
