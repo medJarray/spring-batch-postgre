@@ -46,9 +46,9 @@ mjarray:
       files:
         tar-file-name-pattern: (ecomerce_import)(.*)\.tgz$
         column-delimiter: '|'
-        command-file-prefix: orders_
-        product-file-prefix: products_
-        sale-file-prefix: sale_
+        order-file-prefix: order
+        product-file-prefix: product
+        sale-file-prefix: sale
       order-status:
           - PAIED
           - EXPIRED
